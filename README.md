@@ -1,0 +1,5 @@
+# Require
+
+- fzf
+- gh
+- glow
