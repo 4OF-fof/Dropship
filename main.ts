@@ -25,20 +25,23 @@ await $`echo ${hoge}`;
 async function getLocalPrjList() {
   //const DSRoot = Deno.env.get("DSRoot");
   const DSRoot = "C:\\Users\\sora6\\Downloads\\hoge";
-  const localProjectList: string[] = await getDirList(DSRoot);
-  console.log(localProjectList)
+  const localProjectList: string[] = await getPrjList(DSRoot);
+  const hubRepoList: string[] = await getHubPrjList();
+  console.log(localProjectList);
+  console.log(hubRepoList);
 }
 
-function getRemotePrjList() {
-
+async function getHubPrjList() {
+  const hubRepoList: string[] = (await $`gh repo list --json name --jq '.[].name'`.text()).split("\n");
+  return hubRepoList;
 }
 
-async function getDirList(root: string): Promise<string[]> {
-  const files = Deno.readDir(root);
+async function getPrjList(root: string): Promise<string[]> {
+  const files = walk(root);
   const prjList: string[] = [];
   for await (const file of files) {
-      if (file.isDirectory) {
-          prjList.push(file.name);
+      if (file.isDirectory && file.name == ".git") {
+          prjList.push(file.path);
       }
   }
   return prjList;
